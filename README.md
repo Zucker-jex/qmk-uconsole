@@ -28,6 +28,17 @@ Perfect for verifying your firmware installation and familiarizing yourself with
 
 ## 🎹 Special Key Behaviors
 
+* **Remapped A/B/X/Y in keyboard mode:**
+
+| Key    | Gamepad mode    | Keyboard mode
+|--------|-----------------|--------------
+| A      | `JS_0` (A)      | Execute (`KC_EXECUTE`)
+| B      | `JS_1` (B)      | Stop    (`KC_STOP`)
+| X      | `JS_2` (X)      | System Request (`KC_SYSTEM_REQUEST`)
+| Y      | `JS_3` (Y)      | Menu    (`KC_MENU`)
+| Select | `JS_4` (Select) | Select  (`KC_SELECT`)
+| Start  | `JS_5` (Start)  | Super   (`KC_LEFT_GUI`)
+
 * **Tap-Hold Keys (Letters, Numbers & Special Characters):** Most alphabetic keys, numbers, and special character keys support tap-hold functionality:
     * **Tap (< 200ms)** — Sends the lowercase letter or base character (e.g., `a`, `1`, `-`)
     * **Hold (≥ 200ms)** — Sends the uppercase letter or shifted symbol (e.g., `A`, `!`, `_`)
@@ -55,19 +66,23 @@ This provides a quick two-state toggle for precise pointer adjustments.
 
 ## 🎯 Installation Guide
 
-**⚠️ WARNING:** Use SSH or an external keyboard when performing these operations. In case of issues, you'll still be able to interact with the device to re-flash or troubleshoot.
+**⚠️ WARNING:**
+Don't install a firmware image without another input method, like an external
+keyboard or SSH connection, or you won't have any way to fix it if it fails.
+The uConsole keyboard is an independent USB device, so even if it has issues
+the rest of the unit is unaffected.
 
 ### Prerequisites
 
 Before starting, ensure you have the necessary tools installed on your uConsole:
 
 1. **Install DFU utilities:**
-   ```bash
+   ```sh
    sudo apt install -y dfu-util
    ```
 
 2. **Download the original stock firmware package:**
-   ```bash
+   ```sh
    wget https://github.com/clockworkpi/uConsole/raw/master/Bin/uconsole_keyboard_flash.tar.gz
    tar zxvf uconsole_keyboard_flash.tar.gz
    cd uconsole_keyboard_flash
@@ -89,7 +104,7 @@ If you're upgrading from the original ClockworkPi firmware:
    Open `maple_upload` and change all delay values from `750` to `1500` milliseconds. This prevents "serial port not ready" errors.
 
 2. **Flash the firmware:**
-   ```bash
+   ```sh
    sudo ./maple_upload ttyACM0 2 1EAF:0003 clockworkpi_uconsole_default.bin
    ```
 ---
@@ -99,25 +114,28 @@ If you're upgrading from the original ClockworkPi firmware:
 If you already have QMK installed and want to update:
 
 1. **Run the DFU utility:**
-   ```bash
+   ```sh
    sudo dfu-util -w -d 1eaf:0003 -a 2 -D clockworkpi_uconsole_default.bin -R
    ```
 
 2. **Enter bootloader mode:**
    
-   When you see `waiting for device, exit with ctrl-C`, press these three keys **simultaneously**:
-   
-   **`Left Alt` + `Right Alt` + `Start`**
+When dfu-util says `waiting for device, exit with ctrl-C`, press **Left Alt**,
+**Right Alt**, and **Start**, all **simultaneously**.
 
-   After installing the QMK firmware, bootload has 2-3 seconds window open for uploading firmware. Otherwise it will verify the existing firmware and functional as normal.
+After installing the QMK firmware, the bootloader has a 2-3 second window for
+uploading firmware. Otherwise it will verify the existing firmware and continue
+to function normally.
 
 ---
 
 ### 🆘 Recovery: Unbricking Your Keyboard
 
-In some rare cases, the keyboard did enter into the DFU mode, however, the firmware did not flash (keep showing waiting or ctrl+c to cancel) and keyboad is not responsive, try to reboot the OS then flash again.
+In some rare cases, the keyboard will have entered the DFU mode, but the
+firmware won't have flashed and the keyboard won't respond to input. If this
+happens, try rebooting the operating system and repeating the flashing steps.
 
-If this is bricked after reboot, Don't panic if your keyboard becomes unresponsive! Follow these steps to restore it:
+If the keyboard remains non-functional, don't panic! Follow these steps:
 
 1. **Connect the micro-USB cable** from your uConsole to the keyboard
 
@@ -127,7 +145,7 @@ If this is bricked after reboot, Don't panic if your keyboard becomes unresponsi
 ![Bootloading illustration](https://github.com/j1n6/qmk-uconsole/blob/main/images/uconsole%20keyboard%20bootloading.jpeg?raw=true)
 
 3. **Flash the stock firmware:**
-   ```bash
+   ```sh
    cd uconsole_keyboard_flash
    sudo ./flash
    ```
