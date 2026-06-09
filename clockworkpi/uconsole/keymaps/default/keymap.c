@@ -75,10 +75,14 @@ const key_override_t vol_key_override =
 const key_override_t *key_overrides[] = {&vol_key_override};
 
 const uint16_t PROGMEM bootloader_combo[] = {KC_LALT, KC_RALT, KC_LGUI, COMBO_END};
+#ifndef DISABLE_TAP_HOLD
 const uint16_t PROGMEM tap_hold_combo[] = {LH_T, KC_HOME, COMBO_END};
+#endif
 combo_t key_combos[] = {
   COMBO(bootloader_combo, QK_BOOT),
+#ifndef DISABLE_TAP_HOLD
   COMBO(tap_hold_combo, KB_TAP_HOLD),
+#endif
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -248,8 +252,10 @@ static const uint16_t tap_hold_map[][2] = {
   {LH_COMM, KC_COMM},  {LH_DOT, KC_DOT},
 };
 
+#ifndef DISABLE_TAP_HOLD
 static uint16_t tap_hold_key_press_times[TAP_HOLD_KEY_COUNT] = {0};
 static bool tap_hold_passthrough[TAP_HOLD_KEY_COUNT] = {false};
+#endif
 
 // Helper function to get base keycode from tap-hold keycode
 static uint16_t get_base_keycode(uint16_t keycode) {
@@ -266,6 +272,7 @@ static bool is_tap_hold_key(uint16_t keycode) {
   return (keycode >= LH_A && keycode <= LH_9) || (keycode >= LH_GRV && keycode <= LH_DOT);
 }
 
+#ifndef DISABLE_TAP_HOLD
 // Helper function to get the index of a tap-hold key
 static int get_tap_hold_index(uint16_t keycode) {
   if (keycode >= LH_A && keycode <= LH_Z) {
@@ -284,6 +291,7 @@ static bool is_tap_hold_passthrough_active(void) {
   uint8_t active_mods = get_mods() | get_weak_mods() | get_oneshot_mods();
   return (active_mods & MOD_MASK_CSAG) || layer_state_is(LY1);
 }
+#endif
 
 void keyboard_post_init_user(void) {
   keyboard_config.raw = eeconfig_read_user();
@@ -305,6 +313,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   if (is_tap_hold_key(keycode)) {
     uint16_t base_key = get_base_keycode(keycode);
 
+#ifdef DISABLE_TAP_HOLD
+    if (record->event.pressed) {
+      register_code(base_key);
+    } else {
+      unregister_code(base_key);
+    }
+    return false;
+#else
     int index = get_tap_hold_index(keycode);
     bool passthrough_active = record->event.pressed && is_tap_hold_passthrough_active();
 
@@ -340,6 +356,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
     }
     return false;  // Don't let QMK handle this key
+#endif
   }
 
   switch (keycode) {
@@ -349,10 +366,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
       return false;
     case KB_TAP_HOLD:
+#ifndef DISABLE_TAP_HOLD
       if (record->event.pressed) {
         keyboard_config.tap_hold_enabled = !keyboard_config.tap_hold_enabled;
         eeconfig_update_user(keyboard_config.raw);
       }
+#endif
       return false;
     case MO(LY1):
       // Fn: only perform normal layer switching; do not toggle scroll mode
