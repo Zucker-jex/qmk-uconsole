@@ -82,6 +82,8 @@ Before starting, ensure you have the necessary tools installed on your uConsole:
    sudo apt install -y dfu-util
    ```
 
+On musl libc Linux systems, you have to install gcompat first for the upload script to work. On Alpine or postmarketOS, this can be done via `sudo apk add gcompat`.
+
 2. **Download the original stock firmware package:**
    ```sh
    wget https://github.com/clockworkpi/uConsole/raw/master/Bin/uconsole_keyboard_flash.tar.gz
