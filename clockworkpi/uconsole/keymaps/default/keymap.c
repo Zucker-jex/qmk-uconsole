@@ -408,26 +408,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
 #endif
       return false;
-    // case MO(LY1):
-    //   // Fn: only perform normal layer switching; do not toggle scroll mode
-    //   return true;  // Allow normal layer switching to continue
-    // case KC_SELECT: case JS_4:
-    //   // Select key enables scroll mode while held (preserve tap behavior)
-    //   select_button_pressed = record->event.pressed;
-    //   if (record->event.pressed) {
-    //       select_button_scrolled = false;
-    //   } else {
-    //       if (!select_button_scrolled) {
-    //           if (keycode == KC_SELECT) {
-    //               register_code(KC_SELECT);
-    //               unregister_code(KC_SELECT);
-    //           } else {
-    //               register_joystick_button(keycode - JS_0);
-    //               unregister_joystick_button(keycode - JS_0);
-    //           }
-    //       }
-    //   }
-    //   return false;
     case MO(LY1):
       // Fn key: enable scroll mode while held
       select_button_pressed = record->event.pressed;
